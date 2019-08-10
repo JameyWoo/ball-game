@@ -54,8 +54,9 @@ def main():
 
     running = True
     pause = False
+    is_game_over = False
     clock = pygame.time.Clock()
-    start_sound.play()
+    # start_sound.play()
 
     while running:
         # if pause:
@@ -100,16 +101,47 @@ def main():
             knock_sound.play()
             speed_ball[1] = -speed_ball[1]
         elif position_ball.bottom > position_line.top:
-            game_over_sound.play()
-            print('game over')
-            speed_ball = [0, 0]
+            if is_game_over == False:
+                game_over_sound.play()
+                is_game_over = True
+                speed_ball = [0, 0]
 
         # screen.fill((0, 255, 255))
         screen.blit(background, (0, 0))
         screen.blit(ball, position_ball)
         screen.blit(line, position_line)
+        if is_game_over:  # 游戏结束, 两个选项, 重新开始还是退出游戏
+            game_over = pygame.font.Font('../font/font.ttf', 80)
+            game_over_font = game_over.render("Game Over", True, (0, 0, 0))
+            game_over_loc = (240, 150)
+            screen.blit(game_over_font, game_over_loc)
+            restart = game_over.render("Restart Game", True, (0, 0, 0))
+            restart_loc = (240, 220)
+            screen.blit(restart, restart_loc)
+            restart_pos = restart.get_rect()
+            game_exit = game_over.render("Exit Game", True, (0, 0, 0))
+            game_exit_loc = (240, 300)
+            screen.blit(game_exit, game_exit_loc)
+            game_exit_pos = game_exit.get_rect()
+
+            # 奇怪的位置, 为什么初始时不是返回正确位置
+            restart_pos.left, restart_pos.top = restart_loc
+            game_exit_pos.left, game_exit_pos.top = game_exit_loc
+
+            if pygame.mouse.get_pressed()[0]:
+                pos = pygame.mouse.get_pos()
+                if restart_pos.left < pos[0] < restart_pos.right and \
+                        restart_pos.top < pos[1] < restart_pos.bottom:
+                    print('重新开始游戏')
+                    main()
+                elif game_exit_pos.left < pos[0] < game_exit_pos.right and \
+                        game_exit_pos.top < pos[1] < game_exit_pos.bottom:
+                    print('退出游戏')
+                    pygame.quit()
+                    sys.exit()
+
         pygame.display.flip()  # 更新界面
-        clock.tick(60)
+        clock.tick(60)  # 设置帧率60
 
 
 if __name__ == "__main__":
