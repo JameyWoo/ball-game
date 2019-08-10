@@ -9,9 +9,7 @@
 
 import pygame
 import sys
-from pygame.locals import *
-from random import *
-import traceback
+import time
 
 
 def main():
@@ -56,15 +54,21 @@ def main():
     pause = False
     is_game_over = False
     clock = pygame.time.Clock()
+    last_time = time.time()
+    score = 0.0
     # start_sound.play()
 
     while running:
-        # if pause:
-        #     for event in pygame.event.get():
-        #         if event.type == pygame.MOUSEBUTTONDOWN and event.pos
-        #
-        # else:
-        #     pass
+        now_time = time.time()
+        # print(last_time - now_time)
+        if not is_game_over and last_time - now_time < -1.0:  # 每隔一秒更新一次速度
+            speed_ball[0] += 0.2 if speed_ball[0] > 0 else -0.2
+            speed_ball[1] += 0.2 if speed_ball[1] > 0 else -0.2
+            last_time = now_time
+            score += speed_ball[0] if speed_ball[0] > 0 else -speed_ball[0]
+            score += speed_ball[1] if speed_ball[1] > 0 else -speed_ball[1]
+            # print(speed_ball, 'score: ', score)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # 叉掉退出
                 pygame.quit()
@@ -106,8 +110,13 @@ def main():
                 is_game_over = True
                 speed_ball = [0, 0]
 
-        # screen.fill((0, 255, 255))
+        # 显示分数
+        font = pygame.font.Font('../font/font.ttf', 60)
+        score_dis = font.render('score: ' + str(int(score)), True, (255, 0, 0))
+        score_dis_loc = (width - 300, 10)
+
         screen.blit(background, (0, 0))
+        screen.blit(score_dis, score_dis_loc)
         screen.blit(ball, position_ball)
         screen.blit(line, position_line)
         if is_game_over:  # 游戏结束, 两个选项, 重新开始还是退出游戏
@@ -132,11 +141,11 @@ def main():
                 pos = pygame.mouse.get_pos()
                 if restart_pos.left < pos[0] < restart_pos.right and \
                         restart_pos.top < pos[1] < restart_pos.bottom:
-                    print('重新开始游戏')
+                    # print('重新开始游戏')
                     main()
                 elif game_exit_pos.left < pos[0] < game_exit_pos.right and \
                         game_exit_pos.top < pos[1] < game_exit_pos.bottom:
-                    print('退出游戏')
+                    # print('退出游戏')
                     pygame.quit()
                     sys.exit()
 
