@@ -23,13 +23,13 @@ def main():
 
     # 设置各种图形
     background = pygame.image.load('../image/plane.png').convert_alpha()
-    ball = pygame.image.load('../image/ball.png').convert_alpha()  # 设置透明通道
+    ball = pygame.image.load('../image/logo.ico').convert_alpha()  # 设置透明通道
     # icon = ball
     # pygame.display.set_icon(icon)
     shape_ball = width_ball, height_ball = 50, 50
     ball = pygame.transform.scale(ball, shape_ball)
     line = pygame.image.load('../image/line.png').convert_alpha()
-    shape_line = width_line, height_line = 200, 30
+    shape_line = width_line, height_line = 200, 10
     line = pygame.transform.scale(line, shape_line)
     # 设置暂停按钮
     pause_nor_img = pygame.image.load('../image/pause_nor.png').convert_alpha()
