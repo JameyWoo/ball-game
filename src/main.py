@@ -56,6 +56,8 @@ def main():
     clock = pygame.time.Clock()
     last_time = time.time()
     score = 0.0
+    count_up = 0
+    waigua = False  # 设一个外挂模式, 按g切换模式
     start_sound.play()
 
     # 读取文件中的分数
@@ -80,6 +82,7 @@ def main():
                     pygame.quit()
                     sys.exit()
 
+        screen.fill((255, 255, 255))
         screen.blit(background, (0, 0))
         start_game = pygame.font.Font('../font/font.ttf', 80)
         start_game_font = start_game.render("Ball Game", True, (0, 0, 0))
@@ -131,6 +134,11 @@ def main():
             score += speed_ball[0] if speed_ball[0] > 0 else -speed_ball[0]
             score += speed_ball[1] if speed_ball[1] > 0 else -speed_ball[1]
             # print(speed_ball, 'score: ', score)
+            # 更新线的高度(难度设置), 1s中line向上移动3像素
+            position_line.top -= 3
+            count_up += 3
+            if (count_up % 30 == 0):
+                position_line.top += 30
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # 叉掉退出
@@ -150,6 +158,9 @@ def main():
                         position_line.left = 0
                         continue
                     position_line.left -= 10
+                elif event.key == pygame.K_g:
+                    waigua = not waigua
+                    print('外挂模式' + "开启" if waigua else "关闭")
 
 
         position_ball = position_ball.move(speed_ball)  # 小球移动
@@ -157,7 +168,7 @@ def main():
         if position_ball.left < 0 or position_ball.right > width:  # 弹到左右边界
             speed_ball[0] = -speed_ball[0]
             knock_sound.play()
-        elif position_ball.top < 0:  # 弹到上边界
+        elif position_ball.top < 0 or (waigua is True and position_ball.bottom > position_line.top):  # 弹到上边界
             speed_ball[1] = -speed_ball[1]
             knock_sound.play()
         # 弹到line
@@ -180,6 +191,7 @@ def main():
         score_dis = font.render('score: ' + str(int(score)), True, (255, 0, 0))
         score_dis_loc = (width - 300, 10)
 
+        screen.fill((255, 255, 255))
         screen.blit(background, (0, 0))
         screen.blit(score_dis, score_dis_loc)
         screen.blit(ball, position_ball)
