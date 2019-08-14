@@ -56,7 +56,70 @@ def main():
     clock = pygame.time.Clock()
     last_time = time.time()
     score = 0.0
-    # start_sound.play()
+    start_sound.play()
+
+    # 读取文件中的分数
+    scores = []
+    with open('scores.txt', 'r', encoding='utf-8') as file:
+        file_score = file.readlines()
+        # print(file_score)
+        for each in file_score:
+            scores.append(int(each))
+        # print(scores)
+        # print(sorted(scores, reverse=True))
+        scores = sorted(scores, reverse=True)[: 3]
+
+    # 正式进入游戏前的选项画面
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:  # 叉掉退出
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:  # 按q退出
+                    pygame.quit()
+                    sys.exit()
+
+        screen.blit(background, (0, 0))
+        start_game = pygame.font.Font('../font/font.ttf', 80)
+        start_game_font = start_game.render("Ball Game", True, (0, 0, 0))
+        start_game_loc = (120, 100)
+        screen.blit(start_game_font, start_game_loc)
+        restart = start_game.render("Play Game", True, (0, 0, 0))
+        restart_loc = (120, 220)
+        screen.blit(restart, restart_loc)
+        restart_pos = restart.get_rect()
+        game_exit = start_game.render("Exit Game", True, (0, 0, 0))
+        game_exit_loc = (120, 360)
+        screen.blit(game_exit, game_exit_loc)
+        game_exit_pos = game_exit.get_rect()
+
+        start_game_small = pygame.font.Font(None, 50)
+        best_scores = start_game_small.render("Top 3 Scores", True, (0, 0, 0))
+        screen.blit(best_scores, (500, 200))
+        for i, each in enumerate(scores):
+            score_dis = start_game_small.render(str(each), True, (0, 0, 0))
+            score_loc = (530, 275 + 50 * i)
+            screen.blit(score_dis, score_loc)
+
+        # 奇怪的位置, 为什么初始时不是返回正确位置
+        restart_pos.left, restart_pos.top = restart_loc
+        game_exit_pos.left, game_exit_pos.top = game_exit_loc
+
+        if pygame.mouse.get_pressed()[0]:
+            pos = pygame.mouse.get_pos()
+            if restart_pos.left < pos[0] < restart_pos.right and \
+                    restart_pos.top < pos[1] < restart_pos.bottom:
+                # print('重新开始游戏')
+                break
+            elif game_exit_pos.left < pos[0] < game_exit_pos.right and \
+                    game_exit_pos.top < pos[1] < game_exit_pos.bottom:
+                # print('退出游戏')
+                pygame.quit()
+                sys.exit()
+
+        pygame.display.flip()  # 更新界面
+        clock.tick(60)  # 设置帧率60
 
     while running:
         now_time = time.time()
@@ -108,6 +171,8 @@ def main():
             if is_game_over == False:
                 game_over_sound.play()
                 is_game_over = True
+                with open('scores.txt', 'a+', encoding='utf-8') as file:
+                    file.write(str(int(score)) + '\n')
                 speed_ball = [0, 0]
 
         # 显示分数
